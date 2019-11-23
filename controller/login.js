@@ -1,4 +1,4 @@
-var user = require("../models/UserSchema");
+var user = require("../models/User");
 var jwt = require("jsonwebtoken"); //to create token(encrypted string) for authentication
 var Response = require("../models/response");
 var response = new Response();
