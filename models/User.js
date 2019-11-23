@@ -12,5 +12,6 @@ const userSchema = Schema({
     signUpDate: {type: Date,default: Date.now()}
 });
 
+
 var User = mongoose.model("User", userSchema);
 module.exports = User;

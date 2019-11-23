@@ -71,12 +71,18 @@ app.post("/user/update/:id", (req, res) => {
         }
     );
 });
-app.post('/user/delete/:id', (req, res) => {
-    user.findByIdAndRemove(req.params.id, (err, data) => {
-        if (err) return res.status(404).send({ error: err.message });
-        return res.send({ message: 'Service is successfully deleted!', data })
+
+app.delete("/user/delete/:id", (request, response) => {
+  user.findByIdAndDelete(request.params.id)
+    .then(() => {
+      console.log(`${request.params.id} has been deleted`);
+      response.json({ message: `${request.params.id} has been deleted` });
     })
-})
+    .catch(error => {
+      console.log("Error: ", error);
+      response.status(400).json({ message: error });
+    });
+});
     
 
     // app.post("/user/create", (req, res) => {
