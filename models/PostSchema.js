@@ -4,10 +4,11 @@ const Schema = mongoose.Schema;
 const userSchema = Schema({
     foodName: {type: String,required:true},
     description:{type: String,required:true},
-    image:{type: Object,required:true},
+    image:{type: String,default: "none",required: true},
     ingredients:{type: String,required:true},
-    procedure:{type:String,required:true}
+    procedure:{type:String,required:true},
+    postDate: {type: Date,default: Date.now()}
 });
 
-const User = mongoose.model("User", userSchema);
-module.exports = User;
+const Post = mongoose.model("Post", userSchema);
+module.exports = Post;

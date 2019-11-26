@@ -7,12 +7,18 @@ const login = require("./controller/login");
 const insert = require("./controller/insert");
 const verify = require("./controller/verify");
 const user = require("./models/User");
+const imgRoutes = require('./controller/images')
+const multer = require('multer')
+const path = require('path');
+
 
 const PORT = process.env.PORT || 4000;
 //middleware
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 app.use(bodyParser.json({ limit: "50mb" }));
+app.use('/uploads', imgRoutes);
+app.use(express.static('./images'));
 
 // Database
 
@@ -58,6 +64,22 @@ app.post("/user/create", (req, res) => {
       res.send({ message: err.message });
     }
   });
+
+
+  var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'images')
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.fieldname + '-' + Date.now())
+    }
+  });
+  
+  var upload = multer({ storage: storage });
+
+  app.post('/user/post', upload.single('photo'), (req, res, next) => {
+    console.log('hello')
+  })
   
 app.post("/user/update/:id", (req, res) => {
     console.log(req.body);
