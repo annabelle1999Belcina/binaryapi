@@ -10,7 +10,7 @@ const user = require("./models/User");
 const imgRoutes = require('./controller/images')
 const multer = require('multer')
 const path = require('path');
-
+const bcrypt = require('bcryptjs');
 
 const PORT = process.env.PORT || 4000;
 //middleware
@@ -30,10 +30,10 @@ app.get("/", (req, res) => {
     console.log("hello world!");
     res.send("API");
 });
-app.post("/login", (req, res) => {
-    console.log(req.body);
-    login.login(req.body, res);
-});
+// app.post("/login", (req, res) => {
+//     console.log(req.body);
+//     login.login(req.body, res);
+// });
 app.get("/verify/:token", (req, res) => {
     verify.verify(req.params.token, res);
 });
@@ -65,6 +65,25 @@ app.post("/user/create", (req, res) => {
     }
   });
 
+  app.post("/login", (req, res)=> {
+    console.log('login test')
+    user.findOne({ userName: req.body.userName })
+      .then(user => {
+        console.log("User from login", user)
+        if (!user) res.sendStatus(204);
+        else {
+          bcrypt.compare(req.body.password, user.password)
+            .then(passwordMatch => passwordMatch ? res.sendStatus(200) : res.sendStatus(204))
+        }
+      })
+  });
+  app.get("/getUser" ,(req, res) => {
+    console.log("getuser test")
+    user.findOne(req.body.userName, (err, user) => {
+      if (err) { res.send(err) }
+      else { res.send(user) };
+    })
+  });
 
   var storage = multer.diskStorage({
     destination: function (req, file, cb) {
