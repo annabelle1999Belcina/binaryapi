@@ -42,6 +42,13 @@ app.post("/login", (req, res) =>{
 			}
 		})
 });
+// 
+app.get("/getUser", (req, res) =>{
+	user.findOne(req.body.userName, (err, user) => {
+		if (err) { res.send(err) }
+		else { res.send(user) };
+	})
+});
 app.get("/verify/:token", (req, res) => {
     verify.verify(req.params.token, res);
 });
