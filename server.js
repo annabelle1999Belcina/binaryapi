@@ -32,7 +32,6 @@ app.get("/", (req, res) => {
     res.send("API");
 });
 app.post("/login", (req, res) =>{
-
 	user.findOne({ userName: req.body.userName })
 		.then(user => {
 			console.log("User from login", user)
