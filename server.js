@@ -32,6 +32,7 @@ app.get("/", (req, res) => {
     res.send("API");
 });
 app.post("/login", (req, res) =>{
+
 	user.findOne({ userName: req.body.userName })
 		.then(user => {
 			console.log("User from login", user)
@@ -44,9 +45,9 @@ app.post("/login", (req, res) =>{
 });
 // 
 app.get("/getUser", (req, res) =>{
-	user.findOne(req.body.userName, (err, user) => {
+	user.findOne(req.body.userName, (err, currentUser) => {
 		if (err) { res.send(err) }
-		else { res.send(user) };
+		else { res.send(currentUser) };
 	})
 });
 app.get("/verify/:token", (req, res) => {
