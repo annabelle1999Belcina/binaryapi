@@ -2,6 +2,8 @@ var user = require("../models/User");
 var jwt = require("jsonwebtoken"); //to create token(encrypted string) for authentication
 var Response = require("../models/response");
 var response = new Response();
+const bcrypt = require('bcryptjs');
+
 
 module.exports.login = (credentials, res) => {
   console.log(credentials);
@@ -15,6 +17,7 @@ module.exports.login = (credentials, res) => {
         error = false;
       }
       response.setSuccessResponse(
+        
         { accessToken: jwt.sign(token, "secret") },//decrypt
         "Login Successful!"
       );

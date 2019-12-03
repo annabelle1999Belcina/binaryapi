@@ -36,63 +36,39 @@ app.post("/login", (req, res) => {
   user.findOne({ userName: req.body.userName })
     .then(user => {
       console.log("User from login", user)
-      if (!user) res.sendStatus(204);
+      // if (!user) res.sendStatus(204);
+      if (user) {
+        var match = bcrypt.compare(req.body.password, user.password)
+        if (match) {
+          var acc_token = jwt.sign({ user }, "token1234", { expiresIn: "12h" })
+          res.send({
+            status: true,
+            auth: true,
+            user: user,
+            token: acc_token
+          })
+          res.sendStatus(200)
+        }
+        else {
+          res.sendStatus(204)
+        }
+        // .then(passwordMatch => passwordMatch ? res.sendStatus(200) : res.sendStatus(204))
+      }
       else {
-        bcrypt.compare(req.body.password, user.password)
-        var acc_token = jwt.sign({ user }, "token1234", { expiresIn: "12h" })
-        res.send({
-          status: true,
-          auth: true,
-          user: user,
-          token: acc_token
-        })
-          .then(passwordMatch => passwordMatch ? res.sendStatus(200) : res.sendStatus(204))
-
+        res.sendStatus(204);
       }
     })
 });
 
-// app.post("/login", (req, res) => {
-//   // console.log(req.body)
-//   var userName = req.body.userName
-//   var password = req.body.password
-//   user.findOne({ userName: userName }, function (err, data) {
-//     if (err) {
-//       res.send(err)
-//     }
-//     console.log("User from login", user)
-//     if (data != null) {
-//       var match = bcrypt.compareSync(pass, data.Password)
-//       if (match) {
-//         var acc_token = jwt.sign({ data }, "token1234", { expiresIn: "12h" })
-//         res.send({
-//           status: true,
-//           auth: true,
-//           user: data,
-//           token: acc_token
-//         })
-//       } else {
-//         res.send({
-//           status: false,
-//           auth: false,
-//           sms: "Incorrect Password!!"
-//         })
-//       }
-//     }
-//     res.send({
-//       status: false,
-//       auth: false,
-//       sms: "Username not found!!"
-//     })
-//   })
-// });
 
-// 
-app.get("/getUser", (req, res) => {
-  user.findOne(req.body.userName, (err, currentUser) => {
-    if (err) { res.send(err) }
-    else { res.send(currentUser) };
-  })
+app.get("/getUser/:userName", (req, res) => {
+  user.findOne({ userName: req.params.userName })
+    .then(user => {
+      res.send(user)
+    })
+    .catch(error => {
+      res.send(error)
+    })
 });
 
 app.get("/user/retrieve", (req, res) => {
