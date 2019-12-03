@@ -11,6 +11,7 @@ const imgRoutes = require('./controller/images')
 const multer = require('multer')
 const path = require('path');
 const bcrypt = require('bcryptjs');
+const jwt = require("jsonwebtoken"); //to create token(encrypted string) for authentication
 
 
 const PORT = process.env.PORT || 4000;
@@ -24,107 +25,132 @@ app.use(express.static('./images'));
 // Database
 
 app.listen(PORT, "0.0.0.0", () => {
-    console.log("Server is running in PORT..," + PORT);
+  console.log("Server is running in PORT..," + PORT);
 });
 
 app.get("/", (req, res) => {
-    console.log("hello world!");
-    res.send("API");
+  console.log("hello world!");
+  res.send("API");
 });
-app.post("/login", (req, res) =>{
-	user.findOne({ userName: req.body.userName })
-		.then(user => {
-			console.log("User from login", user)
-			if (!user) res.sendStatus(204);
-			else {
-				bcrypt.compare(req.body.password, user.password)
-					.then(passwordMatch => passwordMatch ? res.sendStatus(200) : res.sendStatus(204))
-			}
-		})
-});
-// 
-app.get("/getUser", (req, res) =>{
-	user.findOne(req.body.userName, (err, currentUser) => {
-		if (err) { res.send(err) }
-		else { res.send(currentUser) };
-	})
-});
-app.get("/verify/:token", (req, res) => {
-    verify.verify(req.params.token, res);
+app.post("/login", (req, res) => {
+  user.findOne({ userName: req.body.userName })
+    .then(user => {
+      console.log("User from login", user)
+      if (!user) res.sendStatus(204);
+      else {
+        bcrypt.compare(req.body.password, user.password)
+        var acc_token = jwt.sign({ user }, "token1234", { expiresIn: "12h" })
+        res.send({
+          status: true,
+          auth: true,
+          user: user,
+          token: acc_token
+        })
+          .then(passwordMatch => passwordMatch ? res.sendStatus(200) : res.sendStatus(204))
+
+      }
+    })
 });
 
-app.post("/insert", (req, res) => {
-    insert.insert(req.body, res);
+// app.post("/login", (req, res) => {
+//   // console.log(req.body)
+//   var userName = req.body.userName
+//   var password = req.body.password
+//   user.findOne({ userName: userName }, function (err, data) {
+//     if (err) {
+//       res.send(err)
+//     }
+//     console.log("User from login", user)
+//     if (data != null) {
+//       var match = bcrypt.compareSync(pass, data.Password)
+//       if (match) {
+//         var acc_token = jwt.sign({ data }, "token1234", { expiresIn: "12h" })
+//         res.send({
+//           status: true,
+//           auth: true,
+//           user: data,
+//           token: acc_token
+//         })
+//       } else {
+//         res.send({
+//           status: false,
+//           auth: false,
+//           sms: "Incorrect Password!!"
+//         })
+//       }
+//     }
+//     res.send({
+//       status: false,
+//       auth: false,
+//       sms: "Username not found!!"
+//     })
+//   })
+// });
+
+// 
+app.get("/getUser", (req, res) => {
+  user.findOne(req.body.userName, (err, currentUser) => {
+    if (err) { res.send(err) }
+    else { res.send(currentUser) };
+  })
 });
 
 app.get("/user/retrieve", (req, res) => {
-    user.find({}, (err, data) => {
-        if (err) {
-            return res.status(404).send("Error while getting list of services!");
-        }
-        return res.send({ data });
+  user.find({}, (err, data) => {
+    if (err) {
+      return res.status(404).send("Error while getting list of services!");
+    }
+    return res.send({ data });
+  });
+});
+
+
+
+app.post("/user/create", (req, res) => {
+  let register = new user(req.body);
+  register.save()
+    .then(register => {
+      res.sendStatus(200);
+      console.log(register);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(400).send("Failed to store to database");
     });
 });
-
-// app.post("/user/create", (req, res) => {
-//     console.log("test");
-//     try {
-//       const data = new user(req.body);
-//       data.save((err, dbres) => {
-//         if (err) return res.status(404).send({ message: err.message });
-//         console.log(dbres);
-//         return res.send({ info: dbres, status: true });
-//       });
-//     } catch (err) {
-//       res.send({ message: err.message });
-//     }
-//   });
-  
-  app.post("/user/create", (req, res)=> {
-    let register = new user(req.body);
-    register.save()
-      .then(register => {
-        res.sendStatus(200);
-        console.log(register);
-      })
-      .catch(err => {
-        console.log(err);
-        res.status(400).send("Failed to store to database");
-      });
-  });
-  // Username validation Router
+// Username validation Router
 app.post("/user/validate", (req, res) => {
-	user.findOne({ user_name: req.body.user_name })
-		.then(user => user ? res.sendStatus(204) : res.sendStatus(200))
+  user.findOne({ userName: req.body.userName })
+    .then(user => user ? res.sendStatus(204) : res.sendStatus(200))
 });
 
 
-  var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, 'images')
-    },
-    filename: function (req, file, cb) {
-      cb(null, file.fieldname + '-' + Date.now())
-    }
-  });
-  
-  var upload = multer({ storage: storage });
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'images')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now())
+  }
+});
 
-  app.post('/user/post', upload.single('photo'), (req, res, next) => {
-    console.log('hello')
-  })
-  
+var upload = multer({ storage: storage });
+
+app.post('/user/post', upload.single('photo'), (req, res, next) => {
+  console.log('hello')
+})
+
 app.post("/user/update/:id", (req, res) => {
-    console.log(req.body);
-    user.findByIdAndUpdate(
-        req.params.id,//from database
-        req.body,//from the front end
-        { new: true },
-        (err, data) => {
-            if (err) return res.status(404).send({ error: err.message });
-            return res.send({ message: "Service is successfully updated", data });
-        }
-    );
+  console.log(req.body);
+  user.findByIdAndUpdate(
+    req.params.id,//from database
+    req.body,//from the front end
+    { new: true },
+    (err, data) => {
+      if (err) return res.status(404).send({ error: err.message });
+      return res.send({ message: "Service is successfully updated", data });
+    }
+  );
 });
 
 app.delete("/user/delete/:id", (request, response) => {
@@ -138,7 +164,7 @@ app.delete("/user/delete/:id", (request, response) => {
       response.status(400).json({ message: error });
     });
 });
-    
+
 
     // app.post("/user/create", (req, res) => {
 //     const data = new user({
@@ -154,3 +180,24 @@ app.delete("/user/delete/:id", (request, response) => {
 //         return res.send({ data });
 //     });
 // });
+
+// app.get("/verify/:token", (req, res) => {
+//     verify.verify(req.params.token, res);
+// });
+
+// app.post("/insert", (req, res) => {
+//     insert.insert(req.body, res);
+// });
+// app.post("/user/create", (req, res) => {
+//     console.log("test");
+//     try {
+//       const data = new user(req.body);
+//       data.save((err, dbres) => {
+//         if (err) return res.status(404).send({ message: err.message });
+//         console.log(dbres);
+//         return res.send({ info: dbres, status: true });
+//       });
+//     } catch (err) {
+//       res.send({ message: err.message });
+//     }
+//   });

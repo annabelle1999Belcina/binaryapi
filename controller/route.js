@@ -5,23 +5,11 @@ let user = require('../models/User');
 let post = require('../models/PostSchema');
 
 
-// Registration route
-routes.route('/user/create').post(function (req, res) {
-	let register = new user(req.body);
-	register.save()
-		.then(register => {
-			res.sendStatus(200);
-			console.log(register);
-		})
-		.catch(err => {
-			console.log(err);
-			res.status(400).send("Failed to store to database");
-		});
-});
+
 
 // Login Router
-routes.route('/login').post(function (req, res) {
-	Registration.findOne({ user_name: req.body.user_name })
+routes.route('/user/login').post(function (req, res) {
+	user.findOne({ user_name: req.body.user_name })
 		.then(user => {
 			console.log("User from login", user)
 			if (!user) res.sendStatus(204);
