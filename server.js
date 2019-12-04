@@ -12,7 +12,7 @@ const multer = require('multer')
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken"); //to create token(encrypted string) for authentication
-
+const Post = require("./models/PostSchema");
 
 const PORT = process.env.PORT || 4000;
 //middleware
@@ -142,38 +142,15 @@ app.delete("/user/delete/:id", (request, response) => {
 });
 
 
-    // app.post("/user/create", (req, res) => {
-//     const data = new user({
-//         firstName: req.body.firstName,
-//         lastName: req.body.lastName,
-//         gender: req.body.gender,
-//         userName: req.body.userName,
-//         email: req.body.email,
-//         password: req.body.password,
-//     });
-//     data.save(err => {
-//         if (err) return res.status(404).send({ message: err.message });
-//         return res.send({ data });
-//     });
-// });
+app.post("/addPost",(req, res)=> {
+	let post = new Posts(req.body);
 
-// app.get("/verify/:token", (req, res) => {
-//     verify.verify(req.params.token, res);
-// });
-
-// app.post("/insert", (req, res) => {
-//     insert.insert(req.body, res);
-// });
-// app.post("/user/create", (req, res) => {
-//     console.log("test");
-//     try {
-//       const data = new user(req.body);
-//       data.save((err, dbres) => {
-//         if (err) return res.status(404).send({ message: err.message });
-//         console.log(dbres);
-//         return res.send({ info: dbres, status: true });
-//       });
-//     } catch (err) {
-//       res.send({ message: err.message });
-//     }
-//   });
+	post.save()
+		.then(post => {
+			res.sendStatus(200);
+			console.log(post)
+		})
+		.catch(err => {
+			res.status(400).send("Failed to add post");
+		})
+})
