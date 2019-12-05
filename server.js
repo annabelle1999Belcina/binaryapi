@@ -149,7 +149,7 @@ app.get("/posts/retrieve", (req, res) => {
     if (err) {
       return res.status(404).send("Error while getting list of services!");
     }
-    return res.send({ data });
+    return res.send(data);
   });
 });
 app.get("/posts/retrieve:_id", (req, res) => {
