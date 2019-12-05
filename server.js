@@ -12,8 +12,8 @@ const multer = require('multer')
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken"); //to create token(encrypted string) for authentication
-const Post = require("./models/PostSchema");
-
+const Posts = require("./models/PostSchema");
+const fs = require('fs');
 const PORT = process.env.PORT || 4000;
 //middleware
 app.use(cors());
@@ -102,20 +102,65 @@ app.post("/user/validate", (req, res) => {
 
 
 var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'images')
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now())
-  }
+  destination: function (req, file, cb){
+    cb(null, './images/')
+},
+filename: function (req, file, cb){
+  cb(null, Date.now() + file.originalname);
+}
 });
 
-var upload = multer({ storage: storage });
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/gif'){
+      cb(null, true);
+  } else {
+      cb(null, false);
+  }
+}
 
-app.post('/user/post', upload.single('photo'), (req, res, next) => {
+const upload = multer({
+  storage: storage,
+  limits:{fileSize:10000000},
+  fileFilter: fileFilter
+}).single("myImage");
+
+
+// var upload = multer({ storage: storage,
+//   limits:{fileSize:10000000},
+// }).single("myImage");
+
+
+
+app.post('/post', upload, (req, res, next) => {
   console.log('hello')
+  let post = new Posts(req.body);
+  post.save()
+    .then(post => {
+      res.sendStatus(200);
+      console.log(post);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(400).send("Failed to store to database");
+    });
 })
-
+app.get("/posts/retrieve", (req, res) => {
+  Posts.find({}, (err, data) => {
+    if (err) {
+      return res.status(404).send("Error while getting list of services!");
+    }
+    return res.send({ data });
+  });
+});
+app.get("/posts/retrieve:_id", (req, res) => {
+  Posts.findOne({ _id: req.params._id })
+    .then(user => {
+      res.send(user)
+    })
+    .catch(error => {
+      res.send(error)
+    })
+});
 app.post("/user/update/:id", (req, res) => {
   console.log(req.body);
   user.findByIdAndUpdate(
@@ -142,15 +187,15 @@ app.delete("/user/delete/:id", (request, response) => {
 });
 
 
-app.post("/addPost",(req, res)=> {
-	let post = new Posts(req.body);
+// app.post("/addPost",(req, res)=> {
+// 	let post = new Posts(req.body);
 
-	post.save()
-		.then(post => {
-			res.sendStatus(200);
-			console.log(post)
-		})
-		.catch(err => {
-			res.status(400).send("Failed to add post");
-		})
-})
+// 	post.save()
+// 		.then(post => {
+// 			res.sendStatus(200);
+// 			console.log(post)
+// 		})
+// 		.catch(err => {
+// 			res.status(400).send("Failed to add post");
+// 		})
+// })

@@ -40,6 +40,7 @@ ImageRouter.route("/uploadmulter")
     let url = 'http://localhost:4000/'+req.file.filename;
 
     const newPost = new post({
+        userId:req.body.userId,
         foodName: req.body.foodName,
         description:req.body.description,
         image:url,

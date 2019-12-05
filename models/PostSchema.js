@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const userSchema = Schema({
+    userId:{type: String,required:true},
     foodName: {type: String,required:true},
     description:{type: String,required:true},
     image:{type: String,default: "none",required: true},
