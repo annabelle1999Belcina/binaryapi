@@ -9,8 +9,14 @@ const userSchema = Schema({
     userName:{type: String,required:true},
     email:{type:String,required:true},
     password:{type: String,required:true},
+
     // isDeleted: {type: Boolean,default: false},
-    signUpDate: {type: Date,default: Date.now()}
+    signUpDate: {type: Date,default: Date.now()},
+    address:{type: String,required:true},
+    workPlace:{type: String,required:true},
+    education:{type: String,required:true},
+    relationShip:{type: String,required:true},
+    bio:{type: String,required:true}
 });
 // userSchema.methods.generateHash = function(password) {
 //     return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);

@@ -27,39 +27,36 @@ const upload = multer({
     // },
     fileFilter: fileFilter
 });
-//saves images to database
+
 ImageRouter.route("/uploadmulter")
 .post(upload.single('image'), (req, res, next) => {
-    console.log(req.file);
-    console.log(req.file.filename);
+    // console.log(req.file.filename);
+    // const newImage = new Image({})
     if(!req.files){
         var file = fs.readFileSync(req.file.path);
-        console.log(file)
         // var encode_image = file.toString('base64');
     }
     let url = 'http://localhost:4000/'+req.file.filename;
 
-    const newPost = new post({
-        userId:req.body.userId,
+    const newImage = new post({
+        user:req.body.user,
         foodName: req.body.foodName,
         description:req.body.description,
         image:url,
+        imageData : req.file.path,
         ingredients:req.body.ingredients,
         procedure:req.body.procedure,
+        postDate:new Date()
     });
-    newPost.save(
-        (err,data) => {
-            if(err){
-                console.log(err);
-                res.send(err)
-            }
-            else{
-                console.log(data);
-                res.send(data)
-            }
-        }
-    )
-
+    newImage.save()
+    .then((result)=>{
+        console.log(result);
+        res.status(200).json({
+            success: true,
+            document: result
+        });
+    })
+    .catch((err) => next(err));
 });
 
 ImageRouter.get('/post', function(req, res) {
@@ -75,10 +72,7 @@ ImageRouter.get('/post', function(req, res) {
             }
         }
         )
-    .sort({created_at: 'desc'});
+    .sort({postDate: 'desc'});
 });
-
-
-
 
 module.exports = ImageRouter
