@@ -169,6 +169,10 @@ app.put('/addComment/:_id',(req, res) =>{
 		})
 })
 
+// add.put('/addLike/:_id',(req,res)=>{
+//   Posts.findOneAndUpdate(req.params._id)
+// })
+
 // app.post("/addPost",(req, res)=> {
 // 	let post = new Posts(req.body);
 

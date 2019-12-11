@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const userSchema = Schema({
-    user:{type: Array},
+    userName:{type: String,required:true},
     foodName: {type: String,required:true},
     description:{type: String,required:true},
     image:{type: String,default: "none",required: true},
@@ -12,7 +12,8 @@ const userSchema = Schema({
     postDate: {type: Date},
     comments: {
 		type: Array
-	},
+  },
+  like:{type:Array}
 	// user:{
 	// 	type: Array
 	// },
