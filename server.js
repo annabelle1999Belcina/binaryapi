@@ -79,6 +79,12 @@ app.get("/user/retrieve", (req, res) => {
     return res.send({ data });
   });
 });
+app.delete('/deletePost/:id',(req, res)=> {
+	console.log(req.params.id)
+	Posts.findByIdAndDelete(req.params.id)
+		.then(() => res.json('Exercise deleted.'))
+		.catch(err => res.status(400).json('Error: ' + err));
+})
 
 
 
@@ -108,15 +114,21 @@ app.get("/posts/retrieve", (req, res) => {
     return res.send(data);
   });
 });
-app.get("/posts/retrieve:_id", (req, res) => {
-  Posts.findOne({ _id: req.params._id })
-    .then(user => {
-      res.send(user)
-    })
-    .catch(error => {
-      res.send(error)
-    })
-});
+// app.get('/posts/retrieve'), (req, res)=> {
+// 	Posts.find()
+// 		.then(posts => res.send(posts))
+// 		.catch(err => res.status(400).json('Error: ' + err));
+
+//   };
+// app.get("/posts/retrieve:userName", (req, res) => {
+//   Posts.findOne({ userName: req.params.userName })
+//     .then(user => {
+//       res.send(user)
+//     })
+//     .catch(error => {
+//       res.send(error)
+//     })
+// });
 app.put("/user/update/:_id", (req, res) => {
   console.log(req.body);
   user.findByIdAndUpdate(
@@ -168,6 +180,7 @@ app.put('/addComment/:_id',(req, res) =>{
 			}
 		})
 })
+
 
 // add.put('/addLike/:_id',(req,res)=>{
 //   Posts.findOneAndUpdate(req.params._id)
